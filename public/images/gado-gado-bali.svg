@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#E9F3D9"/>
+  <circle cx="200" cy="140" r="86" fill="#FFFFFF" stroke="#E8DFD3" stroke-width="6"/>
+  <path d="M136 138h128a64 64 0 0 1-128 0Z" fill="#F3EEE6" stroke="#8C7F73" stroke-width="4"/>
+  <circle cx="174" cy="122" r="16" fill="#78BE20"/>
+  <circle cx="216" cy="116" r="14" fill="#F2C879"/>
+  <path d="M196 104c18 16 18 40 0 56" stroke="#A84300" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <text x="200" y="264" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#1D1426">Gado-Gado Bali</text>
+</svg>

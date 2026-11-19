@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Gambar contoh">
+  <rect width="400" height="300" fill="#F3EEE6"/>
+  <path d="M0 210c60-24 100 20 160 0s100-20 160 0 60 16 80 4v86H0Z" fill="#E8DFD3"/>
+  <circle cx="200" cy="120" r="34" fill="none" stroke="#8C7F73" stroke-width="3"/>
+  <path d="M180 122h40M188 134h24" stroke="#8C7F73" stroke-width="3" stroke-linecap="round"/>
+  <text x="200" y="265" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#5C5265">Gambar contoh</text>
+</svg>

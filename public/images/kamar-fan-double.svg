@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#F3EEE6"/>
+  <rect x="90" y="90" width="220" height="130" rx="12" fill="#FFFFFF" stroke="#8C7F73" stroke-width="5"/>
+  <rect x="110" y="150" width="180" height="56" rx="8" fill="#F1E9F7"/>
+  <circle cx="150" cy="132" r="20" fill="#FAF8F5" stroke="#E8DFD3" stroke-width="4"/>
+  <circle cx="250" cy="132" r="20" fill="#FAF8F5" stroke="#E8DFD3" stroke-width="4"/>
+  <circle cx="320" cy="70" r="24" fill="none" stroke="#5B2C8E" stroke-width="5"/>
+  <text x="200" y="264" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#1D1426">Kamar Fan Double</text>
+</svg>
