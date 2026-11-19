@@ -4,10 +4,15 @@
  */
 
 import {
+  DIVE_FERRY,
+  GAMBAR_OPSI,
   KATEGORI,
+  LIVE_MUSIC,
+  PROFIL,
   WA_NUMBER,
   formatRupiah,
   hitungRingkasan,
+  hitungRingkasanDashboard,
   statusStok,
 } from './products.js';
 
@@ -28,6 +33,8 @@ const PATHS = {
   info: ['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z', 'M12 11v6', 'M12 7.5h.01'],
   warning: ['M12 3 2 20h20L12 3Z', 'M12 9v5', 'M12 17.5h.01'],
   check: ['m5 12 4.5 4.5L19 7'],
+  download: ['M12 3v12', 'm7 10 5 5 5-5', 'M4 20h16'],
+  upload: ['M12 21V9', 'm7 14 5-5 5 5', 'M4 4h16'],
   snorkel: ['M4 15c3-8 13-8 16 0', 'M6 15v4', 'M18 15v4', 'M10 9h4'],
   ferry: ['M3 17h18', 'M5 17V9h14v8', 'M9 9V6h6v3', 'M7 20c1 1 2 1 3 0s2-1 3 0 2 1 3 0 2-1 3 0'],
   waves: ['M2 9c3-3 5 3 8 0s5-3 8 0 4 0 4 0', 'M2 15c3-3 5 3 8 0s5-3 8 0 4 0 4 0'],
@@ -128,6 +135,42 @@ export function pasangTautanWA(root = document) {
   });
 }
 
+/** Mengisi teks profil statis yang ditandai atribut data-profil. */
+export function pasangDataProfil(root = document) {
+  root.querySelectorAll('[data-profil]').forEach((node) => {
+    const nilai = PROFIL[node.dataset.profil];
+    if (typeof nilai === 'string') node.textContent = nilai;
+  });
+}
+
+/** Jadwal live music dari konstanta LIVE_MUSIC (bukan teks hardcoded). */
+export function renderLiveMusic(container) {
+  container.replaceChildren();
+  for (const jadwal of LIVE_MUSIC) {
+    const baris = el('li');
+    baris.append(
+      el('span', 'schedule-day', jadwal.hari),
+      el('span', 'schedule-time', jadwal.jam),
+      el('span', 'schedule-kind', jadwal.jenis),
+    );
+    container.appendChild(baris);
+  }
+}
+
+/** Kartu fasilitas dive/ferry dari konstanta DIVE_FERRY. */
+export function renderFasilitas(container) {
+  container.replaceChildren();
+  const ikon = ['snorkel', 'ferry', 'waves'];
+  DIVE_FERRY.forEach((fasilitas, index) => {
+    const kartu = el('article', 'facility');
+    const ikonWadah = el('span', 'facility-icon');
+    ikonWadah.setAttribute('aria-hidden', 'true');
+    ikonWadah.appendChild(svgIcon(ikon[index] || 'waves'));
+    kartu.append(ikonWadah, el('h3', '', fasilitas.judul), el('p', '', fasilitas.detail));
+    container.appendChild(kartu);
+  });
+}
+
 export function formatJam(iso) {
   if (!iso) return '--.--';
   const tanggal = new Date(iso);
@@ -175,6 +218,122 @@ export function renderSummary(container, items, compact = false) {
     caption.appendChild(document.createTextNode(label));
     kartu.append(angka, caption);
     container.appendChild(kartu);
+  }
+}
+
+const LABEL_RINGKASAN_DASH = [
+  ['total', 'Menu & layanan', 'ungu'],
+  ['tersedia', 'Ketersediaan', 'lime'],
+  ['totalStok', 'Total stok', 'oranye'],
+  ['kategori', 'Kategori', 'ungu'],
+];
+
+export function renderDashboardSummary(container, items) {
+  const ringkasan = hitungRingkasanDashboard(items);
+  container.replaceChildren();
+  for (const [key, label, aksen] of LABEL_RINGKASAN_DASH) {
+    const kartu = el('div', `summary-card summary-${aksen}`);
+    kartu.append(
+      el('p', 'summary-value', String(ringkasan[key])),
+      el('p', 'summary-label', label),
+    );
+    container.appendChild(kartu);
+  }
+}
+
+/** Filter kategori dashboard, lengkap dengan jumlah item per kategori. */
+export function renderDashboardFilter(container, items, aktif) {
+  container.replaceChildren();
+  for (const kategori of KATEGORI) {
+    const jumlah = kategori === 'Semua'
+      ? items.length
+      : items.filter((item) => item.kategori === kategori).length;
+    const chip = el('button', 'chip', `${kategori} (${jumlah})`);
+    chip.type = 'button';
+    chip.dataset.kategori = kategori;
+    container.appendChild(chip);
+  }
+  setChipsActive(container, aktif);
+}
+
+export function renderGambarOptions(select) {
+  select.replaceChildren();
+  for (const opsi of GAMBAR_OPSI) {
+    const option = el('option', '', opsi.label);
+    option.value = opsi.value;
+    select.appendChild(option);
+  }
+}
+
+function sel(label) {
+  const td = el('td');
+  td.dataset.label = label;
+  return td;
+}
+
+/** Tabel dashboard. Di layar sempit, tiap sel menampilkan label lewat CSS. */
+export function renderDashboardTable(container, items) {
+  container.replaceChildren();
+  if (items.length === 0) {
+    const td = el('td', 'dash-empty', 'Belum ada item pada kategori ini. Tambahkan menu atau layanan baru.');
+    td.colSpan = 6;
+    const tr = el('tr');
+    tr.appendChild(td);
+    container.appendChild(tr);
+    return;
+  }
+
+  for (const item of items) {
+    const tr = el('tr');
+    tr.dataset.row = item.id;
+
+    const tdNama = sel('Nama');
+    const identitas = el('div', 'row-identity');
+    identitas.appendChild(gambar(item.imageUrl, '', 'row-thumb', 40, 40));
+    const teks = el('div');
+    teks.appendChild(el('p', 'row-name', item.nama));
+    const ringkas = item.deskripsi.length > 48
+      ? `${item.deskripsi.slice(0, 48)}…`
+      : item.deskripsi;
+    teks.appendChild(el('p', 'caption', ringkas || 'Tanpa deskripsi'));
+    identitas.appendChild(teks);
+    tdNama.appendChild(identitas);
+
+    const tdKategori = sel('Kategori');
+    const kategori = el('span', 'badge badge-kategori');
+    kategori.append(
+      el('span', `dot dot-${dotKategori(item.kategori)}`),
+      document.createTextNode(item.kategori),
+    );
+    tdKategori.appendChild(kategori);
+
+    const tdHarga = sel('Harga');
+    tdHarga.appendChild(el('span', 'price', formatRupiah(item.harga)));
+
+    const tdStok = sel('Stok');
+    tdStok.append(
+      el('span', 'stok-angka', String(item.stok)),
+      badge(statusStok(item.stok), `status-${statusStok(item.stok).toLowerCase()}`),
+    );
+
+    const tdUnggulan = sel('Unggulan');
+    tdUnggulan.appendChild(
+      item.unggulan ? badge('Ya', 'badge-unggulan', 'star') : el('span', 'caption', '—'),
+    );
+
+    const tdAksi = sel('Aksi');
+    const aksi = el('div', 'row-actions');
+    const edit = el('button', 'btn btn-secondary btn-small', 'Edit');
+    edit.type = 'button';
+    edit.dataset.edit = item.id;
+    const hapus = el('button', 'btn btn-danger-ghost btn-small', 'Hapus');
+    hapus.type = 'button';
+    hapus.dataset.hapus = item.id;
+    aksi.append(edit, hapus);
+    tdAksi.appendChild(aksi);
+
+    tr.append(tdNama, tdKategori, tdHarga, tdStok, tdUnggulan, tdAksi);
+    container.appendChild(tr);
   }
 }
 
@@ -257,99 +416,52 @@ export function renderEmptyState(container) {
   container.appendChild(kartu);
 }
 
-function buatInputField(item, nama, labelTeks, nilai) {
-  const wrap = el('div', 'field');
-  const id = `${nama}-${item.id}`;
-  const errorId = `err-${nama}-${item.id}`;
-
-  const label = el('label', 'field-label', labelTeks);
-  label.htmlFor = id;
-
-  const input = el('input', 'field-input');
-  input.type = 'text';
-  input.inputMode = 'numeric';
-  input.autocomplete = 'off';
-  input.id = id;
-  input.value = String(nilai);
-  input.dataset.field = nama;
-  input.setAttribute('aria-describedby', errorId);
-  input.setAttribute('aria-invalid', 'false');
-
-  const error = el('p', 'field-error');
-  error.id = errorId;
-  error.dataset.error = nama;
-  error.setAttribute('aria-live', 'polite');
-
-  wrap.append(label, input, error);
-  return wrap;
+/** Mengisi form dashboard. item = null berarti mode tambah. */
+export function isiFormItem(form, item) {
+  form.elements.namedItem('id').value = item ? item.id : '';
+  form.elements.namedItem('nama').value = item ? item.nama : '';
+  form.elements.namedItem('kategori').value = item ? item.kategori : '';
+  form.elements.namedItem('harga').value = item ? String(item.harga) : '';
+  form.elements.namedItem('stok').value = item ? String(item.stok) : '';
+  form.elements.namedItem('deskripsi').value = item ? item.deskripsi : '';
+  form.elements.namedItem('imageUrl').value = item ? item.imageUrl : '';
+  form.elements.namedItem('unggulan').checked = item ? item.unggulan : false;
+  bersihkanErrorForm(form);
 }
 
-export function renderManagerRows(container, items) {
-  container.replaceChildren();
-
-  for (const item of items) {
-    const row = el('article', 'manager-row');
-    row.dataset.row = item.id;
-
-    const identitas = el('div', 'row-identity');
-    identitas.appendChild(gambar(item.imageUrl, '', 'row-thumb', 40, 40));
-    const teks = el('div');
-    teks.appendChild(el('p', 'row-name', item.nama));
-    teks.appendChild(el('p', 'caption', item.kategori));
-    identitas.appendChild(teks);
-    row.appendChild(identitas);
-
-    const fields = el('div', 'row-fields');
-    fields.appendChild(buatInputField(item, 'harga', 'Harga (Rp)', item.harga));
-    fields.appendChild(
-      buatInputField(item, 'stok', item.kategori === 'Kamar' ? 'Stok (kamar)' : 'Stok', item.stok),
-    );
-    row.appendChild(fields);
-
-    const toggleLabel = el('label', 'switch-row');
-    const toggle = el('input');
-    toggle.type = 'checkbox';
-    toggle.id = `unggulan-${item.id}`;
-    toggle.dataset.field = 'unggulan';
-    toggle.checked = item.unggulan;
-    toggleLabel.append(toggle, el('span', 'switch'), el('span', 'switch-label', 'Unggulan'));
-    row.appendChild(toggleLabel);
-
-    row.appendChild(badge(statusStok(item.stok), `status-${statusStok(item.stok).toLowerCase()}`));
-
-    const simpan = el('button', 'btn btn-primary btn-small', 'Simpan');
-    simpan.type = 'button';
-    simpan.dataset.save = item.id;
-    simpan.disabled = true;
-    row.appendChild(simpan);
-
-    container.appendChild(row);
-  }
-}
-
-/** Dipanggil setelah simpan berhasil: tanpa mengganti fokus pada input. */
-export function tandaiBarisTersimpan(row, item) {
-  row.classList.remove('is-dirty');
-  const simpan = row.querySelector('[data-save]');
-  if (simpan) simpan.disabled = true;
-
-  const statusLama = row.querySelector('[class*="status-"]');
-  if (statusLama) {
-    statusLama.className = `badge status-${statusStok(item.stok).toLowerCase()}`;
-    statusLama.textContent = statusStok(item.stok);
-  }
-  row.querySelectorAll('.field-error').forEach((node) => {
+export function bersihkanErrorForm(form) {
+  form.querySelectorAll('.field-error').forEach((node) => {
     node.textContent = '';
   });
-  row.querySelectorAll('[aria-invalid="true"]').forEach((node) => {
+  form.querySelectorAll('[aria-invalid="true"]').forEach((node) => {
     node.setAttribute('aria-invalid', 'false');
   });
 }
 
+/** Menampilkan error validasi dan memfokuskan field pertama yang bermasalah. */
+export function terapkanErrorForm(form, errors) {
+  bersihkanErrorForm(form);
+  let pertama = null;
+  for (const [nama, pesan] of Object.entries(errors)) {
+    if (!pesan) continue;
+    const input = form.elements.namedItem(nama);
+    if (!input) continue;
+    input.setAttribute('aria-invalid', 'true');
+    const error = input.closest('.field')?.querySelector('.field-error');
+    if (error) error.textContent = pesan;
+    if (!pertama) pertama = input;
+  }
+  if (pertama instanceof HTMLElement) pertama.focus();
+}
+
 export function setSaveIndicator(node, updatedAt, storageOk) {
-  node.textContent = storageOk
+  if (!storageOk) {
+    node.textContent = 'Perubahan hanya berlaku selama halaman terbuka.';
+    return;
+  }
+  node.textContent = updatedAt
     ? `Tersimpan di perangkat ini · ${formatJam(updatedAt)}`
-    : 'Perubahan hanya berlaku selama halaman terbuka.';
+    : 'Tersimpan di perangkat ini.';
 }
 
 export function tampilkanToast(node, pesan) {

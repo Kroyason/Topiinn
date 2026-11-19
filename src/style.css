@@ -1261,6 +1261,13 @@ section[id] {
   margin-bottom: 8px;
 }
 
+.dialog-footer-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .dialog-footer-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1290,24 +1297,148 @@ section[id] {
   margin: 0;
 }
 
-.manager-rows {
+.dash-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-tab {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dash-tab:hover {
+  color: var(--purple);
+}
+
+.dash-tab.is-active {
+  border-bottom-color: var(--purple);
+  color: var(--purple);
+}
+
+.dash-panel {
   display: grid;
   gap: 12px;
 }
 
-.manager-row {
-  display: grid;
+.dash-list-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 16px;
+}
+
+.dash-list-head .chips {
+  flex: 1 1 320px;
+}
+
+.dash-table-wrap {
   border: 1px solid var(--border);
-  border-left: 3px solid transparent;
   border-radius: var(--radius-md);
-  background: var(--surface);
+  overflow: hidden;
 }
 
-.manager-row.is-dirty {
-  border-left-color: var(--purple);
-  background: var(--purple-tint);
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.dash-table th,
+.dash-table td {
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-table th {
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.dash-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.dash-table tbody tr:hover {
+  background: var(--cream);
+}
+
+.dash-table .row-identity {
+  min-width: 200px;
+}
+
+.dash-table .row-thumb {
+  flex: none;
+}
+
+.dash-table .row-name {
+  margin-bottom: 2px;
+}
+
+.dash-table .price {
+  white-space: nowrap;
+}
+
+.stok-angka {
+  display: inline-block;
+  min-width: 2ch;
+  margin-right: 6px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dash-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.dash-form {
+  display: grid;
+  gap: 14px;
+}
+
+.dash-form .field-full {
+  grid-column: 1 / -1;
+}
+
+.dash-form .field-input {
+  height: auto;
+  min-height: 44px;
+}
+
+.dash-form textarea.field-input {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .row-identity {
@@ -1331,11 +1462,6 @@ section[id] {
 
 .row-identity .caption {
   margin: 0;
-}
-
-.row-fields {
-  display: grid;
-  gap: 12px;
 }
 
 .field {
@@ -1429,10 +1555,6 @@ section[id] {
   font-weight: 500;
 }
 
-.manager-row > .badge {
-  justify-self: start;
-}
-
 .confirm-dialog {
   max-width: 460px;
   padding: 24px;
@@ -1454,18 +1576,9 @@ section[id] {
   gap: 8px;
 }
 
-@media (min-width: 768px) {
-  .manager-row {
-    grid-template-columns: minmax(180px, 1.2fr) minmax(240px, 1.3fr) 110px 110px 96px;
-    align-items: center;
-  }
-
-  .row-fields {
+@media (min-width: 640px) {
+  .dash-form {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .manager-row > .badge {
-    justify-self: center;
   }
 }
 
@@ -1478,6 +1591,59 @@ section[id] {
     max-height: 100vh;
     height: 100%;
     border-radius: 0;
+  }
+
+  .dash-table thead {
+    display: none;
+  }
+
+  .dash-table,
+  .dash-table tbody,
+  .dash-table tr,
+  .dash-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .dash-table tr {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dash-table tr:last-child {
+    border-bottom: 0;
+  }
+
+  .dash-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border: 0;
+    text-align: right;
+  }
+
+  .dash-table td::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .dash-table td:first-child {
+    display: block;
+    text-align: left;
+  }
+
+  .dash-table td:first-child::before {
+    display: none;
+  }
+
+  .dash-table .row-actions {
+    justify-content: flex-end;
   }
 }
 

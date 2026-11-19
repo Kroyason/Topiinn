@@ -32,12 +32,12 @@
             type="button"
             class="btn btn-ghost btn-icon-only"
             id="open-manager"
-            aria-label="Buka Mode Pengelola"
+            aria-label="Buka Dashboard Demo"
             aria-haspopup="dialog"
-            title="Mode Pengelola"
+            title="Dashboard Demo — tanpa login"
           >
             <span class="icon-slot" data-icon="sliders"></span>
-            <span class="label-desktop">Mode Pengelola</span>
+            <span class="label-desktop">Dashboard Demo</span>
           </button>
           <a
             class="btn btn-primary header-wa"
@@ -91,7 +91,7 @@
             </div>
             <p class="hero-meta">
               <span class="dot dot-lime" aria-hidden="true"></span>
-              Buka setiap hari · 07.00–22.00 WITA
+              Buka setiap hari · <span data-profil="jamBuka">07.00–22.00 WITA</span>
             </p>
           </div>
           <div class="hero-media">
@@ -183,18 +183,7 @@
               Live music akustik, koktail senja, dan angin laut. Datang lebih awal untuk tempat
               duduk di teras.
             </p>
-            <ul class="schedule">
-              <li>
-                <span class="schedule-day">Jumat &amp; Sabtu</span>
-                <span class="schedule-time">19.00–21.30 WITA</span>
-                <span class="schedule-kind">Akustik lokal</span>
-              </li>
-              <li>
-                <span class="schedule-day">Minggu</span>
-                <span class="schedule-time">18.30–20.30 WITA</span>
-                <span class="schedule-kind">DJ sunset set</span>
-              </li>
-            </ul>
+            <ul id="schedule" class="schedule"></ul>
             <p class="caption">Jadwal contoh, dapat berubah. Konfirmasi via WhatsApp.</p>
             <a
               class="btn btn-secondary"
@@ -218,23 +207,7 @@
         <div class="container">
           <p class="eyebrow">UNTUK PENYELAM &amp; PELANCONG</p>
           <h2 id="dive-title">Dari teras ke laut, lalu ke pulau.</h2>
-          <div class="facility-grid">
-            <article class="facility">
-              <span class="facility-icon" data-icon="snorkel" aria-hidden="true"></span>
-              <h3>Dive center mitra</h3>
-              <p>5 menit jalan kaki</p>
-            </article>
-            <article class="facility">
-              <span class="facility-icon" data-icon="ferry" aria-hidden="true"></span>
-              <h3>Pelabuhan Padangbai</h3>
-              <p>300 m dari restoran</p>
-            </article>
-            <article class="facility">
-              <span class="facility-icon" data-icon="waves" aria-hidden="true"></span>
-              <h3>Ferry ke Gili &amp; Lombok</h3>
-              <p>Tiket dibantu di resepsionis</p>
-            </article>
-          </div>
+          <div id="facilities" class="facility-grid"></div>
           <p class="service-line">Laundry · Antar-jemput bagasi · Info snorkeling</p>
           <a class="text-link" href="#menu" data-nav="kamar">Tanya kamar untuk menginap →</a>
         </div>
@@ -255,8 +228,8 @@
           <a href="#kontak">Kontak</a>
         </nav>
         <div class="footer-contact">
-          <p>Padangbai, Bali</p>
-          <p>07.00–22.00 WITA</p>
+          <p data-profil="lokasi">Padangbai, Bali</p>
+          <p data-profil="jamBuka">07.00–22.00 WITA</p>
           <p>WhatsApp: +62 812-0000-0000 (fiktif)</p>
         </div>
         <div class="footer-cta">
@@ -335,20 +308,197 @@
         <div class="dialog-body">
           <div class="info-note">
             <span class="icon-slot" data-icon="info"></span>
-            <p>Panel demo untuk satu perangkat. Perubahan stok, harga, dan unggulan tersimpan di browser ini saja.</p>
+            <p>
+              Panel demo untuk satu perangkat. Tambah, edit, dan hapus menu/layanan tersimpan di
+              browser ini saja, lalu langsung tampil di daftar publik.
+            </p>
           </div>
           <div id="manager-summary" class="summary-grid summary-grid-compact"></div>
-          <div id="manager-rows" class="manager-rows"></div>
+
+          <div class="dash-tabs" role="tablist" aria-label="Bagian dashboard">
+            <button
+              type="button"
+              id="tab-daftar"
+              class="dash-tab is-active"
+              role="tab"
+              aria-selected="true"
+              aria-controls="panel-daftar"
+              data-dash-tab="daftar"
+            >
+              Daftar Menu &amp; Layanan
+            </button>
+            <button
+              type="button"
+              id="tab-form"
+              class="dash-tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-form"
+              data-dash-tab="form"
+              tabindex="-1"
+            >
+              Form Tambah / Edit
+            </button>
+          </div>
+
+          <div
+            id="panel-daftar"
+            class="dash-panel"
+            role="tabpanel"
+            aria-labelledby="tab-daftar"
+            tabindex="0"
+          >
+            <div class="dash-list-head">
+              <div id="dash-filter" class="chips" role="group" aria-label="Filter kategori dashboard"></div>
+              <button type="button" id="dash-tambah" class="btn btn-primary btn-small">
+                + Tambah item
+              </button>
+            </div>
+            <div class="dash-table-wrap">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Nama</th>
+                    <th scope="col">Kategori</th>
+                    <th scope="col">Harga</th>
+                    <th scope="col">Stok</th>
+                    <th scope="col">Unggulan</th>
+                    <th scope="col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="manager-rows"></tbody>
+              </table>
+            </div>
+            <p id="dash-count" class="caption"></p>
+          </div>
+
+          <div
+            id="panel-form"
+            class="dash-panel"
+            role="tabpanel"
+            aria-labelledby="tab-form"
+            tabindex="0"
+            hidden
+          >
+            <form id="item-form" class="dash-form" novalidate>
+              <input type="hidden" name="id" />
+
+              <div class="field">
+                <label class="field-label" for="form-nama">Nama menu/layanan <span aria-hidden="true">*</span></label>
+                <input
+                  class="field-input"
+                  id="form-nama"
+                  name="nama"
+                  type="text"
+                  maxlength="60"
+                  autocomplete="off"
+                  aria-describedby="err-form-nama"
+                  aria-invalid="false"
+                />
+                <p class="field-error" id="err-form-nama" aria-live="polite"></p>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="form-kategori">Kategori <span aria-hidden="true">*</span></label>
+                <select
+                  class="field-input"
+                  id="form-kategori"
+                  name="kategori"
+                  aria-describedby="err-form-kategori"
+                  aria-invalid="false"
+                >
+                  <option value="">Pilih kategori</option>
+                  <option value="Makanan Lokal">Makanan Lokal</option>
+                  <option value="Vegan / Plant-Based">Vegan / Plant-Based</option>
+                  <option value="Minuman &amp; Koktail">Minuman &amp; Koktail</option>
+                  <option value="Kamar">Kamar Penginapan</option>
+                </select>
+                <p class="field-error" id="err-form-kategori" aria-live="polite"></p>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="form-harga">Harga (Rp) <span aria-hidden="true">*</span></label>
+                <input
+                  class="field-input"
+                  id="form-harga"
+                  name="harga"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  aria-describedby="err-form-harga"
+                  aria-invalid="false"
+                />
+                <p class="field-error" id="err-form-harga" aria-live="polite"></p>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="form-stok">Stok / ketersediaan <span aria-hidden="true">*</span></label>
+                <input
+                  class="field-input"
+                  id="form-stok"
+                  name="stok"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  aria-describedby="err-form-stok"
+                  aria-invalid="false"
+                />
+                <p class="field-error" id="err-form-stok" aria-live="polite"></p>
+              </div>
+
+              <div class="field field-full">
+                <label class="field-label" for="form-deskripsi">Deskripsi (opsional)</label>
+                <textarea
+                  class="field-input"
+                  id="form-deskripsi"
+                  name="deskripsi"
+                  rows="3"
+                  maxlength="240"
+                  aria-describedby="err-form-deskripsi"
+                  aria-invalid="false"
+                ></textarea>
+                <p class="field-error" id="err-form-deskripsi" aria-live="polite"></p>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="form-image">Gambar ilustrasi</label>
+                <select class="field-input" id="form-image" name="imageUrl"></select>
+              </div>
+
+              <label class="switch-row field-full" for="form-unggulan">
+                <input type="checkbox" id="form-unggulan" name="unggulan" />
+                <span class="switch"></span>
+                <span class="switch-label">Tandai sebagai unggulan</span>
+              </label>
+
+              <div class="form-actions field-full">
+                <button type="button" id="form-batal" class="btn btn-ghost">Batal</button>
+                <button type="submit" id="form-simpan" class="btn btn-primary">Simpan item</button>
+              </div>
+              <p id="form-mode" class="caption field-full"></p>
+            </form>
+          </div>
         </div>
 
         <footer class="dialog-footer">
           <div class="dialog-footer-top">
             <p id="save-indicator" class="caption"></p>
           </div>
+          <div class="dialog-footer-tools">
+            <button type="button" id="export-json" class="btn btn-secondary btn-small">
+              <span class="icon-slot" data-icon="download"></span>
+              <span>Ekspor JSON</span>
+            </button>
+            <button type="button" id="import-json" class="btn btn-secondary btn-small">
+              <span class="icon-slot" data-icon="upload"></span>
+              <span>Impor JSON</span>
+            </button>
+            <input type="file" id="import-file" accept="application/json,.json" hidden />
+          </div>
           <div class="dialog-footer-actions">
             <button type="button" id="reset-data" class="btn btn-danger-ghost">
               <span class="icon-slot" data-icon="warning"></span>
-              <span>Reset ke data awal</span>
+              <span>Reset Demo</span>
             </button>
             <button type="button" id="manager-done" class="btn btn-primary">Selesai</button>
           </div>
@@ -365,13 +515,11 @@
         aria-labelledby="confirm-title"
         aria-describedby="confirm-desc"
       >
-        <h2 id="confirm-title">Kembalikan ke data contoh?</h2>
-        <p id="confirm-desc">
-          Semua perubahan stok, harga, dan unggulan di perangkat ini akan hilang. Tindakan ini tidak bisa dibatalkan.
-        </p>
+        <h2 id="confirm-title">Konfirmasi tindakan</h2>
+        <p id="confirm-desc">Tindakan ini tidak bisa dibatalkan.</p>
         <div class="confirm-actions">
           <button type="button" id="confirm-cancel" class="btn btn-ghost">Batal</button>
-          <button type="button" id="confirm-yes" class="btn btn-danger">Ya, reset</button>
+          <button type="button" id="confirm-yes" class="btn btn-danger">Ya, lanjutkan</button>
         </div>
       </section>
     </div>

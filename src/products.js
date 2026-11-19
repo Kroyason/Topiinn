@@ -118,6 +118,21 @@ const DATA_AWAL = [
 
 export const SEED_ITEMS = Object.freeze(DATA_AWAL.map((item) => Object.freeze(item)));
 
+/** Pilihan gambar lokal untuk form dashboard. Hanya path di bawah /images/ yang dipakai. */
+export const GAMBAR_OPSI = Object.freeze([
+  { value: '', label: 'Tanpa gambar' },
+  { value: '/images/nasi-campur-bali.svg', label: 'Nasi Campur Bali' },
+  { value: '/images/mie-goreng-seafood.svg', label: 'Mie Goreng Seafood' },
+  { value: '/images/sate-lilit-tempe.svg', label: 'Sate Lilit Tempe' },
+  { value: '/images/gado-gado-bali.svg', label: 'Gado-Gado Bali' },
+  { value: '/images/es-kelapa-muda.svg', label: 'Es Kelapa Muda' },
+  { value: '/images/arak-madu-sunset.svg', label: 'Arak Madu Sunset' },
+  { value: '/images/kamar-fan-double.svg', label: 'Kamar Fan Double' },
+  { value: '/images/kamar-ac-twin.svg', label: 'Kamar AC Twin' },
+  { value: '/images/hero.svg', label: 'Ilustrasi pantai' },
+  { value: '/images/placeholder.svg', label: 'Placeholder' },
+]);
+
 const formatRupiahIDR = new Intl.NumberFormat('id-ID', {
   style: 'currency',
   currency: 'IDR',
@@ -143,6 +158,16 @@ export function hitungRingkasan(items) {
     tersedia: items.filter((item) => item.stok > 0).length,
     habis: items.filter((item) => item.stok === 0).length,
     unggulan: items.filter((item) => item.unggulan).length,
+  };
+}
+
+/** Ringkasan khusus dashboard: total item, ketersediaan, total stok, dan jumlah kategori aktif. */
+export function hitungRingkasanDashboard(items) {
+  return {
+    total: items.length,
+    tersedia: items.filter((item) => item.stok > 0).length,
+    totalStok: items.reduce((jumlah, item) => jumlah + item.stok, 0),
+    kategori: new Set(items.map((item) => item.kategori)).size,
   };
 }
 
